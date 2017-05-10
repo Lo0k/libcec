@@ -75,7 +75,8 @@ bool CVLCommandHandler::InitHandler(void)
     /* use the VL commandhandler for the primary device that is handled by libCEC */
     if (m_busDevice->GetLogicalAddress() == CECDEVICE_TV)
     {
-      if (primary && m_busDevice->GetLogicalAddress() != primary->GetLogicalAddress())
+      if (primary && m_busDevice->GetLogicalAddress() != primary->GetLogicalAddress() &&
+          primary->GetLogicalAddress() != CECDEVICE_AUDIOSYSTEM)
       {
         libcec_configuration config;
         m_processor->GetPrimaryClient()->GetCurrentConfiguration(config);
@@ -102,7 +103,7 @@ bool CVLCommandHandler::InitHandler(void)
 
 int CVLCommandHandler::HandleDeviceVendorCommandWithId(const cec_command &command)
 {
-  if (!m_processor->IsHandledByLibCEC(command.destination))
+  if (!m_processor->IsHandledByLibCEC(command.destination) && command.destination != CECDEVICE_BROADCAST)
     return CEC_ABORT_REASON_INVALID_OPERAND;
 
   if (command.parameters[0] != 0x00 ||

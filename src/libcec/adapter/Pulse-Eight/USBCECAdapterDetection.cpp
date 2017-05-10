@@ -71,7 +71,7 @@ extern "C" {
 #include <string>
 #include <algorithm>
 #include <stdio.h>
-#include <p8-platform/util/StringUtils.h>
+#include "p8-platform/util/StringUtils.h"
 
 #define CEC_VID  0x2548
 #define CEC_PID  0x1001
@@ -174,13 +174,15 @@ static bool GetComPortFromDevNode(DEVINST hDevInst, char* strPortName, unsigned 
 
 static bool GetPidVidFromDeviceName(const std::string strDevName, int* vid, int* pid)
 {
-  size_t iPidPos = strDevName.find("PID_");
-  size_t iVidPos = strDevName.find("VID_");
-  if (iPidPos == std::string::npos || iVidPos == std::string::npos || (strDevName.find("&MI_") != std::string::npos && strDevName.find("&MI_00") == std::string::npos))
+  std::string strDevNameUpper(strDevName);
+  StringUtils::ToUpper(strDevNameUpper);
+  size_t iPidPos = strDevNameUpper.find("PID_");
+  size_t iVidPos = strDevNameUpper.find("VID_");
+  if (iPidPos == std::string::npos || iVidPos == std::string::npos || (strDevNameUpper.find("&MI_") != std::string::npos && strDevNameUpper.find("&MI_00") == std::string::npos))
     return false;
 
-  std::string strVendorId(strDevName.substr(iVidPos + 4, 4));
-  std::string strProductId(strDevName.substr(iPidPos + 4, 4));
+  std::string strVendorId(strDevNameUpper.substr(iVidPos + 4, 4));
+  std::string strProductId(strDevNameUpper.substr(iPidPos + 4, 4));
 
   sscanf(strVendorId.c_str(), "%x", vid);
   sscanf(strProductId.c_str(), "%x", pid);
